@@ -23,6 +23,22 @@ This project is designed to:
 
 ---
 
+## ⚙️ **Installation**  
+
+1. Clone the repository:  
+   ```bash
+   git clone https://github.com/your-username/Reflected-XSS-Filtration.git
+   cd Reflected-XSS-Filtration
+   ```
+
+2. Install dependencies:  
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
+
 ## ⚙️ **Usage**  
 
 ### 1️⃣ Run the Crawler  
