@@ -1,0 +1,14 @@
+[
+    {
+        "method": "POST",
+        "url": "https://xss-quiz.int21h.jp/?sid=cfb6c997fc170746761dda3e16f2062c6f5efd32/?sid=5ea18a83d86914179f91e4481c4421c2c1dd0896",
+        "headers": {
+            "Host": "xss-quiz.int21h.jp",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Length": "3",
+            "User-Agent": "Mozilla/5.0",
+            "Accept": "*/*"
+        },
+        "body": "p1="
+    }
+]

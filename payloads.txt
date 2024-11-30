@@ -1,0 +1,1 @@
+POST body: param=<script>alert('XSS')</script>

