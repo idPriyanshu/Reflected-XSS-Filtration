@@ -1,0 +1,5 @@
+requests==2.31.0      # For making HTTP requests to target URLs
+beautifulsoup4==4.13.0 # For parsing and extracting information from HTML
+urllib3==1.26.15      # For advanced URL processing
+jsonschema==4.17.3    # For validating JSON payloads
+pandas==1.5.3         # For organizing and analyzing payload results
