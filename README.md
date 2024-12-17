@@ -4,6 +4,15 @@ A Python-based project aimed at detecting **reflected XSS vulnerabilities** in w
 
 ---
 
+## 👥 **Contributors**
+
+Thanks to the following contributors for their efforts in building this project:  
+
+- [@maithilmishra](https://github.com/maithilmishra)
+- [@Piyush3012](https://github.com/Piyush3012)
+
+---
+
 ## 🔍 **Project Overview**  
 
 This project is designed to:  
