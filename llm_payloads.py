@@ -4,7 +4,7 @@ import re
 import traceback
 
 def generate_xss_payloads_via_llm(context, num=5):
-    api_key = "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"
+    api_key = "<YOUR_API_KEY>"  # Replace with your actual API key
     url = "https://openrouter.ai/api/v1/chat/completions"
 
     headers = {
