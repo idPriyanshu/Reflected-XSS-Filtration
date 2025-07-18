@@ -1,120 +1,135 @@
 import os
+import json
+import re
+import time
+import logging
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-import json
-import re
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0",
+    "Accept": "text/html,application/xhtml+xml"
+}
 
 def sanitize_filename(url):
-    # Remove invalid characters from the filename
+    """Sanitize filename for saving HTML."""
     return re.sub(r'[<>:"/\\|?*\']', '_', url)
 
 def save_html(url, content):
-    # Create a folder for saving HTML files if it doesn't exist
-    if not os.path.exists('html_files'):
-        os.makedirs('html_files')
-
-    # Generate a safe filename based on the URL
-    safe_filename = sanitize_filename(url.replace('https://', '').replace('http://', '').replace('/', '_')) + '.html'
+    """Save raw HTML content to file."""
+    os.makedirs('html_files', exist_ok=True)
+    safe_filename = sanitize_filename(urlparse(url).netloc + urlparse(url).path).strip('_') + '.html'
     file_path = os.path.join('html_files', safe_filename)
-
-    # Save the HTML content to a file
-    with open(file_path, 'w', encoding='utf-8') as file:
-        file.write(content)
-    print(f"Saved HTML content for: {url}")
+    try:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        logging.info(f"[Saved HTML] {file_path}")
+    except Exception as e:
+        logging.warning(f"[Failed to Save HTML] {url}: {e}")
 
 def clear_files():
-    # Clear url.txt
-    with open('url.txt', 'w') as text_file:
-        text_file.write("")  # Overwrite the file with empty content
-
-    # Clear url_data.json
-    with open('url_data.json', 'w') as json_file:
-        json.dump([], json_file, indent=4)  # Write an empty JSON array
+    """Clear previous output files."""
+    open('url.txt', 'w').close()
+    with open('url_data.json', 'w') as jf:
+        json.dump([], jf, indent=4)
 
 def clear_html_files():
-    # Remove all HTML files in the html_files directory
-    html_files_dir = 'html_files'
-    if os.path.exists(html_files_dir):
-        for file_name in os.listdir(html_files_dir):
-            file_path = os.path.join(html_files_dir, file_name)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-                
+    """Delete all saved HTML files from previous run."""
+    html_dir = 'html_files'
+    if os.path.exists(html_dir):
+        for filename in os.listdir(html_dir):
+            filepath = os.path.join(html_dir, filename)
+            if os.path.isfile(filepath):
+                os.remove(filepath)
+
+def is_html_page(url):
+    """Check if URL points to a likely HTML resource."""
+    return not re.search(r'\.(jpg|jpeg|png|gif|pdf|doc|zip|exe|svg|ico|css|js)(\?|$)', url, re.IGNORECASE)
 
 def crawl(url, visited, base_domain):
-    if url in visited:  # Avoid re-crawling the same URL
+    """Main crawling function."""
+    if url in visited or not is_html_page(url):
         return
-    visited.add(url)  # Mark the URL as visited
-
-    urls_data = []  # List to collect formatted URLs
+    visited.add(url)
 
     try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        response = requests.get(url, headers=HEADERS, timeout=10)
+        content_type = response.headers.get('Content-Type', '')
+        if 'text/html' not in content_type:
+            logging.warning(f"[Non-HTML Skipped] {url}")
+            return
 
-        # Save the HTML content of the main page
+        soup = BeautifulSoup(response.text, 'html.parser')
         save_html(url, response.text)
 
-        # Extract all GET request links
-        for link in soup.find_all('a', href=True):
-            href = link['href']
-            full_url = urljoin(url, href)  # Handles relative links
+        new_entries = []
 
-            # Only process URLs within the base domain
-            if urlparse(full_url).netloc == base_domain:
-                if full_url not in visited:  # Avoid adding already visited URLs
-                    urls_data.append({"method": "GET", "url": full_url})
-                    print(f"Found GET link: {full_url}")
+        # Crawl GET links
+        for tag in soup.find_all('a', href=True):
+            href = urljoin(url, tag['href'])
+            parsed = urlparse(href)
+            if parsed.netloc == base_domain and is_html_page(href) and href not in visited:
+                new_entries.append({"method": "GET", "url": href})
+                logging.info(f"[Found GET] {href}")
+                crawl(href, visited, base_domain)  # Recursive call
 
-                    # Recursively crawl internal links only
-                    crawl(full_url, visited, base_domain)
-
-        # Extract all POST request forms
+        # Crawl POST forms
         for form in soup.find_all('form'):
-            form_action = form.get('action')
             form_method = form.get('method', 'GET').upper()
-            if form_action and form_method == 'POST':
-                full_url = urljoin(url, form_action)  # Handle relative form action
+            form_action = form.get('action', '')
+            action_url = urljoin(url, form_action)
+            parsed = urlparse(action_url)
+            if form_method == 'POST' and parsed.netloc == base_domain:
+                entry = {"method": "POST", "url": action_url}
+                if entry not in new_entries:
+                    new_entries.append(entry)
+                    logging.info(f"[Found POST] {action_url}")
+                    try:
+                        form_resp = requests.get(action_url, headers=HEADERS, timeout=10)
+                        save_html(action_url, form_resp.text)
+                    except:
+                        logging.warning(f"[POST Fetch Failed] {action_url}")
 
-                # Only process forms within the base domain
-                if urlparse(full_url).netloc == base_domain:
-                    if full_url not in visited:  # Avoid adding already visited URLs
-                        urls_data.append({"method": "POST", "url": full_url})
-                        print(f"Found POST form: {full_url}")
+        # Write to url.txt
+        with open('url.txt', 'a') as txt_file:
+            for entry in new_entries:
+                txt_file.write(f"{entry['method']} {entry['url']}\n")
 
-                        # Save HTML of POST forms
-                        form_response = requests.get(full_url)  # Fetching the form page
-                        save_html(full_url, form_response.text)
-
-        # Write all collected URLs to url.txt in the specified format (e.g., "METHOD URL")
-        with open('url.txt', 'a') as text_file:  # Use 'a' to append to the file
-            for entry in urls_data:
-                formatted_entry = f"{entry['method']} {entry['url']}\n"
-                text_file.write(formatted_entry)  # Write formatted entry to the file
-
-        # Append URLs to url_data.json
+        # Write to url_data.json
         try:
-            with open('url_data.json', 'r') as json_file:
-                existing_data = json.load(json_file)
+            with open('url_data.json', 'r') as jf:
+                data = json.load(jf)
         except (FileNotFoundError, json.JSONDecodeError):
-            existing_data = []
+            data = []
 
-        existing_data.extend(urls_data)
+        # Avoid duplication in JSON
+        for entry in new_entries:
+            if entry not in data:
+                data.append(entry)
 
-        with open('url_data.json', 'w') as json_file:
-            json.dump(existing_data, json_file, indent=4)
+        with open('url_data.json', 'w') as jf:
+            json.dump(data, jf, indent=4)
+
+        time.sleep(1)  # Rate limiting
 
     except Exception as e:
-        print(f"Failed to process {url}: {str(e)}")
+        logging.error(f"[Crawl Failed] {url}: {e}")
 
-# Start crawling the domain
-u = input("Enter Domain for Crawling: ")
-base_domain = urlparse(u).netloc  # Extract the base domain
-visited_urls = set()  # Set to track visited URLs
+if __name__ == "__main__":
+    user_input = input("Enter domain to crawl (e.g., https://example.com): ").strip()
+    if not user_input.startswith("http"):
+        user_input = "https://" + user_input
 
-# Clear previously stored data before starting the new crawl
-clear_files()
-clear_html_files()
+    base_domain = urlparse(user_input).netloc
+    visited = set()
 
-crawl(u, visited_urls, base_domain)
+    clear_files()
+    clear_html_files()
+
+    logging.info(f"[Starting Crawl] Base domain: {base_domain}")
+    crawl(user_input, visited, base_domain)
+    logging.info("[Crawling Complete]")

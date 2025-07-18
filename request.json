@@ -1,7 +1,7 @@
 [
     {
         "method": "POST",
-        "url": "https://xss-quiz.int21h.jp/?sid=cfb6c997fc170746761dda3e16f2062c6f5efd32/?sid=5ea18a83d86914179f91e4481c4421c2c1dd0896",
+        "url": "https://xss-quiz.int21h.jp/stage2.php?sid=06715bc9989e6de1633b28090a0363d7d496822e",
         "headers": {
             "Host": "xss-quiz.int21h.jp",
             "Content-Type": "application/x-www-form-urlencoded",

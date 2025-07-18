@@ -1,0 +1,38 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=euc-jp">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script language="JavaScript" type="text/javascript" src="script.js"></script>
+  <title>XSS Challenges (by yamagata21) - Stage #2</title>
+</head>
+<body><div>
+<h1>XSS Challenges</h1> <!-- Cross Site Scripting (XSS) Quiz -->
+<h2>Stage #2</h2>
+<b>What you have to do:</b><br>
+Inject the following JavaScript command: <code>alert(document.domain);</code><p>
+<b>Hint:</b> <span id="hide">close the current tag and add SCRIPT tag...</span>
+<input type="hidden" name="key" value="tubhf.4/qiq">
+<form action="?sid=cc02e5fa4c9f94cb561c8f2cd785338720524306" method="post">
+<hr class=red>Search: <input type="text" name="p1" size="60" value=""> <input type="submit" value="Search">
+<hr class=red>
+</form>
+<span id="msg" style="display:none"></span>
+<p><hr>
+This page was written by yamagata21, 
+inspired by <a href="http://blogged-on.de/xss/" target=_new>http://blogged-on.de/xss/</a>.
+</div>
+
+<!-- Google Analytics / *** THIS IS NOT A TARGET. PLEASE LAY OFF! *** -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-53066-4");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<!-- Google Analytics / *** THIS IS NOT A TARGET. PLEASE LAY OFF! *** -->
+
+</body>
+</html>
